@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $files = new DirectoryIterator($date);
         foreach ($files as $file)
         {
-            if ($file->isFile() && mb_strpos($file->getFilename(), $category) !== false)
+            if ($file->isFile() && false !== mb_strpos($file->getFilename(), $category))
             {
                 $article = readArticleFromFile($file->getRealPath());
                 $filteredArticles[] = $article;
@@ -24,17 +24,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    usort($filteredArticles, function($a, $b) {
-        return strcmp($a['title'], $b['title']);
-    });
-    
+    $forbidden = '\/:*?"<>|+%!@«»';
+    usort($filteredArticles, fn($a, $b) => strcmp(
+        preg_replace("/[${forbidden}]/", '', $a['title']),
+        preg_replace("/[${forbidden}]/", '', $b['title']),
+    ));
+
     echo "<h2>Результаты поиска:</h2>";
     if (count($filteredArticles) > 0) {
         foreach ($filteredArticles as $article) {
             echo "<h3>" . $article['title'] . "</h3>";
             foreach ($article['text'] as $p) {
                 if ($p !== "") {
-                    echo "<p>" . $p . "</p>";  
+                    echo "<p>" . $p . "</p>";
                 }
             }
         }
