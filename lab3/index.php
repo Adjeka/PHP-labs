@@ -211,4 +211,84 @@ echo "Люди, родившиеся в праздничные дни: <br/>";
 foreach ($holidayBirthdays as $date => $names) {
     echo "$date: " . implode(', ', $names) . "<br/>";
 }
+
+// Запросы GET
+function processFileForRegion($filePath, $region) {
+    $data = [];
+    $file = fopen($filePath, 'r');
+    if (!$file) {
+        die("Не удалось открыть файл.");
+    }
+    while (($line = fgets($file)) !== false) {
+        $data[] = explode(';', trim($line));
+    }
+    fclose($file);
+
+    // Фильтрация записей по области
+    $filteredData = array_filter($data, function($person) use ($region) {
+        return trim($person[6]) === $region;
+    });
+
+    // Сортировка записей по фамилии (индекс 3)
+    usort($filteredData, function($a, $b) {
+        return strcmp($a[3], $b[3]);
+    });
+
+    return $filteredData;
+}
+
+function displayRegionResidents($filteredData) {
+    echo "<style>
+        .female { color: pink; }
+        .male { color: lightblue; }
+    </style>";
+    echo "<h3>Жители области</h3>";
+    if (empty($filteredData)) {
+        echo "<p>Нет данных для выбранной области.</p>";
+    } else {
+        echo "<table>
+            <tr>
+                <th>Имя</th>
+                <th>Фамилия</th>
+                <th>Пол</th>
+                <th>Возраст</th>
+                <th>Почтовый адрес</th>
+            </tr>";
+        foreach ($filteredData as $person) {
+            $name = $person[1];
+            $surname = $person[3];
+            $gender = $person[4];
+            $age = calculateAge($person[9]);
+            $address = htmlspecialchars($person[14] . ', ' . $person[15] . ', ' . $person[16]);
+
+            // Определяем класс для окрашивания имени в зависимости от пола
+            $nameClass = ($gender === 'female') ? 'female' : 'male';
+
+            echo "<tr>
+                <td class='$nameClass'>$name</td>
+                <td>$surname</td>
+                <td>$gender</td>
+                <td>$age</td>
+                <td>$address</td>
+            </tr>";
+        }
+        echo "</table>";
+    }
+
+    echo "</body></html>";
+}
+
+function processRequest($filePath) {
+    // Получаем область из GET-запроса
+    $region = isset($_GET['region']) ? trim($_GET['region']) : null;
+
+    if ($region) {
+        $filteredData = processFileForRegion($filePath, $region);
+        displayRegionResidents($filteredData);
+    } else {
+        echo "Пожалуйста, укажите область через параметр 'region' в URL.";
+    }
+}
+
+processRequest($outputFile);
 ?>
