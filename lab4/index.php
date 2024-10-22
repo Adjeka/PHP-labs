@@ -6,7 +6,7 @@ $connectionString = "pgsql:host=localhost;port=5432;dbname=lab1;user=pguser;pass
 $pdo = new PDO($connectionString);
 
 // Получаем все объекты из базы данных
-$sql = "SELECT id, name, description FROM landmarks";
+$sql = "SELECT id, name, description, image FROM landmarks";
 $stmt = $pdo->query($sql);
 $landmarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -24,11 +24,11 @@ HTML;
     $id = $landmark['id'];
     $name = $landmark['name'];
     $description = $landmark['description'];
-    ($id > 9) ? $image = "t{$id}" : $image = "t0{$id}";
+    $image = $landmark['image'];
     
     $content .= "<h2>{$name}</h2>";
     $content .= "<p>{$description}</p>";
-    $content .= "<img src='img/{$image}.jpg' alt='{$name}' style='width:300px;'><hr>";
+    $content .= "<img src='img/{$image}' alt='{$name}' style='width:300px;'><hr>";
 }
 
 // Выводим страницу

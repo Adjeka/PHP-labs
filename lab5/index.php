@@ -35,13 +35,12 @@ foreach ($transports as $transport) {
     <br><br>
 
     <label for="distance">Расстояние (км):</label>
-    <input type="number" id="distance" name="distance">
+    <input type="number" step="0.01" id="distance" name="distance">
 
     <br><br>
 
     <label for="fuelConsumption">Расход бензина (литры):</label>
-<!--    <input type="text" id="fuelConsumption" name="fuelConsumption" readonly></input>-->
-    <textarea id="fuelConsumption" name="fuelConsumption" readonly></textarea>
+    <input type="text" id="fuelConsumption" name="fuelConsumption" readonly>
 </form>
 
 <script>

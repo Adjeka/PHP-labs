@@ -10,7 +10,7 @@ $fuelConsumption = 0;
 
 foreach ($data as $row) {
     if ($row['transport'] == $selectedTransport && $row['brand'] == $selectedBrand) {
-        $fuelConsumption = $row['fuelConsumption'];
+        $fuelConsumption = $row['fuelconsumption'];
         break;
     }
 }

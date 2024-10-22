@@ -9,7 +9,7 @@ $pdo = new PDO($connectionString);
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
 // Получаем данные объекта из базы данных
-$sql = "SELECT name, description FROM landmarks WHERE id = :id";
+$sql = "SELECT name, description, image FROM landmarks WHERE id = :id";
 $stmt = $pdo->prepare($sql);
 $stmt->execute(['id' => $id]);
 $landmark = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -22,11 +22,11 @@ if ($landmark) {
     // Контент страницы
     $name = $landmark['name'];
     $description = $landmark['description'];
-    ($id > 9) ? $image = "t{$id}" : $image = "t0{$id}";
+    $image = $landmark['image'];
 
     $content = "<h2>{$name}</h2>";
     $content .= "<p>{$description}</p>";
-    $content .= "<img src='img/{$image}.jpg' alt='{$name}' style='width:300px;'><hr>";
+    $content .= "<img src='img/{$image}' alt='{$name}' style='width:300px;'><hr>";
 
     // Получаем список всех объектов для меню
     $sql = "SELECT id, name, description FROM landmarks";
