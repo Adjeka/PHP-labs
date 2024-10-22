@@ -13,16 +13,23 @@ $landmarks = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Инициализируем страницу
 $page = new HTMLPage("Главная страница");
 
-// Формируем элементы меню для объектов
+// Формируем элементы меню для объектов и контент для главной страницы
+$content = "";
 $menu = [];
 foreach ($landmarks as $landmark) {
     $menu[] .= <<<HTML
                 <li><a href='item.php?id={$landmark['id']}'>{$landmark['name']}</a></li> 
 HTML;
+    
+    $id = $landmark['id'];
+    $name = $landmark['name'];
+    $description = $landmark['description'];
+    ($id > 9) ? $image = "t{$id}" : $image = "t0{$id}";
+    
+    $content .= "<h2>{$name}</h2>";
+    $content .= "<p>{$description}</p>";
+    $content .= "<img src='img/{$image}.jpg' alt='{$name}' style='width:300px;'><hr>";
 }
-
-// Контент для главной страницы
-$content = "";
 
 // Выводим страницу
 $page->write($content, $menu);
