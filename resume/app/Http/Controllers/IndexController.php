@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Staff;
 use Illuminate\Http\Request;
 use App\Models\Person;
+use Illuminate\Routing\Controller;
 
 class IndexController extends Controller
 {
@@ -26,36 +28,39 @@ class IndexController extends Controller
         return view('resume', compact('data', 'header'));
     }
 
-    public function getPeopleWithExperience()
+    // Фамилии персон, имеющих стаж от 5 до 15 лет
+    public function GetPersonsWithExperience()
     {
-        $resumes = Person::whereBetween('experience', [5, 15])
-            ->select('last_name')
-            ->get();
-
-        return view('resumes.experience', compact('resumes'));
+        $header = "Люди со стажем от 5 до 15 лет.";
+        $persons = Person::whereBetween('stage', [5, 15])->get(['FIO', 'stage']);
+        return view('resumes.experience', compact('persons', 'header'));
     }
 
-    public function getProgrammers()
+// Фамилии и стаж людей с профессией "Программист"
+    public function GetProgrammers()
     {
-        $resumes = Person::where('profession', 'Программист')
-            ->select('last_name', 'experience')
-            ->get();
-
-        return view('resumes.programmers', compact('resumes'));
+        $header = "Программисты";
+        $programmers = Person::join('staff', 'persons.staff_id', '=', 'staff.id')
+            ->where('staff.name', 'Программист')
+            ->get(['persons.FIO', 'persons.stage']);
+        return view('resumes.programmers', compact('programmers', 'header'));
     }
 
-    public function getTotalResumes()
+// Общее число резюме в базе
+    public function GetTotalResumes()
     {
+        $header = "Общее число резюме";
         $total = Person::count();
-
-        return view('resumes.total', compact('total'));
+        return view('resumes.total', compact('total', 'header'));
     }
 
-    public function getProfessions()
+// Профессии, представители которых имеются в резюме
+    public function GetStaffWithResumes()
     {
-        $professions = Person::distinct()
-            ->pluck('profession');
-
-        return view('resumes.professions', compact('professions'));
+        $header = "Профессии, представители которых имеются в резюме";
+        $professions = Staff::join('persons', 'staff.id', '=', 'persons.staff_id')
+            ->distinct()
+            ->pluck('staff.name');
+        return view('resumes.professions', compact('professions', 'header'));
     }
 }
