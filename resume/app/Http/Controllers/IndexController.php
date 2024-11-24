@@ -12,20 +12,15 @@ class IndexController extends Controller
     public function Index()
     {
         $header = "Резюме и вакансии";
-        return view('page', compact('header'));
+        $staffs = Staff::with('persons')->get();
+        return view('page', compact('staffs','header'));
     }
 
-    public function Show()
+    public function Show($id)
     {
         $header = "Резюме и вакансии";
-        $data = [
-            'Фамилия' => 'Иванов',
-            'Профессия' => 'Программист',
-            'Телефон' => '55-55-55',
-            'Стаж' => '4 года',
-            'Аватар' => 'ava1.jpg',
-        ];
-        return view('resume', compact('data', 'header'));
+        $person = Person::with('staff')->findOrFail($id); // Получаем запись из базы данных по ID
+        return view('resume', compact('person', 'header'));
     }
 
     // Фамилии персон, имеющих стаж от 5 до 15 лет
@@ -62,5 +57,81 @@ class IndexController extends Controller
             ->distinct()
             ->pluck('staff.name');
         return view('resumes.professions', compact('professions', 'header'));
+    }
+
+    public function create()
+    {
+        $header = "Добавление";
+        $staff = Staff::all();
+        return view('resumes.add-content', compact('staff', 'header'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'FIO' => 'required|string|max:255',
+            'staff_id' => 'required|exists:staff,id',
+            'phone' => 'required|string|max:20',
+            'stage' => 'required|string|max:50',
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            // Сохранение файла и получение имени
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName(); // Генерация уникального имени
+            $file->move(public_path('images'), $fileName); // Сохранение в public/images
+            $data['image'] = $fileName; // Сохраняем только имя файла
+        }
+
+        Person::create($data);
+
+        return redirect()->route('home')->with('success', 'Резюме успешно добавлено!');
+    }
+
+    public function edit(Person $person)
+    {
+        $header = "Редактирование";
+        $staff = Staff::all();
+        return view('resumes.edit-content', compact('person', 'staff', 'header'));
+    }
+
+    public function update(Request $request, Person $person)
+    {
+        $request->validate([
+            'FIO' => 'required|string|max:255',
+            'staff_id' => 'required|exists:staff,id',
+            'phone' => 'required|string|max:20',
+            'stage' => 'required|string|max:50',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        $data = $request->all();
+
+        if ($request->hasFile('image')) {
+            // Удаление старого изображения, если оно существует
+//            if ($person->image && file_exists(public_path('images/' . $person->image))) {
+//                unlink(public_path('images/' . $person->image));
+//            }
+
+            // Сохранение нового изображения
+            $file = $request->file('image');
+            $fileName = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('images'), $fileName);
+            $data['image'] = $fileName;
+        }
+
+        $person->update($data);
+
+        return redirect()->route('home')->with('success', 'Резюме успешно обновлено!');
+    }
+
+    public function delete(Person $person)
+    {
+        $person->delete();
+
+        return redirect()->route('home')->with('success', 'Резюме успешно удалено!');
     }
 }

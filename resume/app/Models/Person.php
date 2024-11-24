@@ -17,4 +17,9 @@ class Person extends Model
         'stage',
         'image'
     ];
+
+    public function staff()
+    {
+        return $this->belongsTo(Staff::class);
+    }
 }

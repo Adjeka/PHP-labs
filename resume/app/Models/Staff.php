@@ -12,4 +12,9 @@ class Staff extends Model
     protected $fillable = [
         'name'
     ];
+
+    public function persons()
+    {
+        return $this->hasMany(Person::class);
+    }
 }
