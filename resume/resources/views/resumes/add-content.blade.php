@@ -9,7 +9,7 @@
             @csrf
             <div class="form-group">
                 <label>ФИО</label>
-                <input type="text" name="FIO" class="form-control" required>
+                <input type="text" name="FIO" class="form-control" value="{{ old('FIO') }}" required>
             </div>
             <div class="form-group">
                 <label>Профессия</label>
@@ -21,11 +21,11 @@
             </div>
             <div class="form-group">
                 <label>Телефон</label>
-                <input type="text" name="phone" class="form-control" required>
+                <input type="text" name="phone" class="form-control" value="{{ old('phone') }}" required>
             </div>
             <div class="form-group">
                 <label>Стаж</label>
-                <input type="text" name="stage" class="form-control" required>
+                <input type="text" name="stage" class="form-control" value="{{ old('stage') }}" required>
             </div>
             <div class="form-group">
                 <label>Изображение</label>
@@ -34,4 +34,14 @@
             <button type="submit" class="btn btn-primary">Добавить</button>
         </form>
     </div>
+
+    @if ($errors->any())
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 @endsection

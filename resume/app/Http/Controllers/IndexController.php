@@ -69,10 +69,19 @@ class IndexController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'FIO' => 'required|string|max:255',
+            'FIO' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/u'
+            ],
             'staff_id' => 'required|exists:staff,id',
-            'phone' => 'required|string|max:20',
-            'stage' => 'required|string|max:50',
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^[78]\d{10}$/'
+            ],
+            'stage' => 'required|integer|min:1',
             'image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
@@ -101,10 +110,19 @@ class IndexController extends Controller
     public function update(Request $request, Person $person)
     {
         $request->validate([
-            'FIO' => 'required|string|max:255',
+            'FIO' => [
+                'required',
+                'string',
+                'max:255',
+                'regex:/^[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+\s[А-ЯЁ][а-яё]+$/u'
+            ],
             'staff_id' => 'required|exists:staff,id',
-            'phone' => 'required|string|max:20',
-            'stage' => 'required|string|max:50',
+            'phone' => [
+                'required',
+                'string',
+                'regex:/^[78]\d{10}$/'
+            ],
+            'stage' => 'required|integer|min:1',
             'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
